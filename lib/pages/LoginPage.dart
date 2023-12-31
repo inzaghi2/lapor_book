@@ -6,6 +6,8 @@ import '../components/styles.dart';
 import '../components/validators.dart';
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   State<StatefulWidget> createState() => LoginPageState();
 }

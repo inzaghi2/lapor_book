@@ -18,11 +18,11 @@ void main() async {
     initialRoute: '/',
     routes: {
       '/': (context) => const SplashPage(),
-      '/login': (context) => LoginPage(),
+      '/login': (context) => const LoginPage(),
       '/register': (context) => const RegisterPage(),
       '/dashboard': (context) => const DashboardPage(),
       '/add': (context) => AddFormPage(),
-      '/detail': (context) => DetailPage(),
+      '/detail': (context) => const DetailPage(),
     },
   ));
 }

@@ -12,7 +12,7 @@ class DashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DashboardFull();
+    return const DashboardFull();
   }
 }
 
@@ -25,9 +25,11 @@ class DashboardFull extends StatefulWidget {
 
 class _DashboardFull extends State<DashboardFull> {
   int _selectedIndex = 0;
+  List<Widget> pages = [];
 
   final _auth = FirebaseAuth.instance;
   final _firestore = FirebaseFirestore.instance;
+  bool _isLoading = false;
 
   Akun akun = Akun(
     uid: '',
@@ -37,10 +39,17 @@ class _DashboardFull extends State<DashboardFull> {
     email: '',
     role: '',
   );
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   void getAkun() async {
     setState(() {
       _isLoading = true;
     });
+
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot = await _firestore
           .collection('akun')
@@ -49,7 +58,7 @@ class _DashboardFull extends State<DashboardFull> {
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        var userData = querySnapshot.docs.first.data() as Map<String, dynamic>;
+        var userData = querySnapshot.docs.first.data();
 
         setState(() {
           akun = Akun(
@@ -73,72 +82,59 @@ class _DashboardFull extends State<DashboardFull> {
     }
   }
 
-  bool _isLoading = false;
-
-  List<Widget> pages = [];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+  @override
+  void initState() {
+    super.initState();
+    getAkun();
   }
 
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    getAkun();
+  Widget build(BuildContext context) {
     pages = <Widget>[
       AllLaporan(akun: akun),
       MyLaporan(akun: akun),
       Profile(akun: akun),
     ];
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: primaryColor,
-        title:
-            Text('Lapor Book', style: TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: primaryColor,
-        child: Icon(Icons.add, size: 35),
-        onPressed: () {
-          print('object');
-          Navigator.pushNamed(context, '/add', arguments: akun);
-        },
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: primaryColor,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        selectedItemColor: Colors.white,
-        selectedFontSize: 16,
-        unselectedItemColor: Colors.grey[800],
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_outlined),
-            label: 'Semua',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.book_outlined),
-            label: 'Laporan Saya',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outlined),
-            label: 'Profile',
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : pages.elementAt(_selectedIndex),
-    );
+        appBar: AppBar(
+          backgroundColor: primaryColor,
+          title: Text('Lapor Book', style: headerStyle(level: 2)),
+          centerTitle: true,
+        ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: primaryColor,
+          child: const Icon(Icons.add, size: 35),
+          onPressed: () {
+            Navigator.pushNamed(context, '/add', arguments: {'akun': akun});
+            // Navigator.pushNamed(context, '/add', arguments: Akun);
+          },
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: primaryColor,
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          selectedItemColor: Colors.white,
+          selectedFontSize: 16,
+          unselectedItemColor: Colors.grey[800],
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard_outlined),
+              label: 'Semua',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.book_outlined),
+              label: 'Laporan Saya',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outlined),
+              label: 'Profile',
+            ),
+          ],
+        ),
+        body: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : pages.elementAt(_selectedIndex));
   }
 }

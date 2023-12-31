@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -36,7 +37,7 @@ class AddFormState extends State<AddFormPage> {
 
   Image imagePreview() {
     if (file == null) {
-      return Image.asset('assets/istock-default.jpg', width: 180, height: 180);
+      return Image.asset('assets/download.png', width: 180, height: 180);
     } else {
       return Image.file(File(file!.path), width: 180, height: 180);
     }
@@ -164,10 +165,16 @@ class AddFormState extends State<AddFormPage> {
     }
   }
 
+  Future<String> loadAsset() async {
+    return await rootBundle.loadString('assets/config.json');
+  }
+
   @override
   Widget build(BuildContext context) {
-    final akun = ModalRoute.of(context)!.settings.arguments as Akun;
-
+    final arguments =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    // final akun = ModalRoute.of(context)!.settings.arguments as Akun;
+    final Akun akun = arguments['akun'];
     return Scaffold(
       appBar: AppBar(
         backgroundColor: primaryColor,
@@ -221,7 +228,11 @@ class AddFormState extends State<AddFormPage> {
                                   return DropdownMenuItem(
                                       child: Text(e), value: e);
                                 }).toList(),
-                                onChanged: (value) => {})),
+                                onChanged: (selected) {
+                                  setState(() {
+                                    instansi = selected;
+                                  });
+                                })),
                         InputLayout(
                             "Deskripsi laporan",
                             TextFormField(
@@ -257,7 +268,7 @@ class AddFormState extends State<AddFormPage> {
 
 class AllLaporan extends StatefulWidget {
   final Akun akun;
-  AllLaporan({super.key, required this.akun});
+  const AllLaporan({super.key, required this.akun});
 
   @override
   State<AllLaporan> createState() => _AllLaporanState();
@@ -302,8 +313,8 @@ class _AllLaporanState extends State<AllLaporan> {
         }
       });
     } catch (e) {
-      // final snackbar = SnackBar(content: Text(e.toString()));
-      // ScaffoldMessenger.of(context).showSnackBar(snackbar);
+      final snackbar = SnackBar(content: Text(e.toString()));
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
       print(e);
     }
   }
