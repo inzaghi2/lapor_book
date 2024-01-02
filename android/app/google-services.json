@@ -1,14 +1,13 @@
 {
   "project_info": {
-    "project_number": "1025158976732",
-    "firebase_url": "https://lapor-book-acba3-default-rtdb.firebaseio.com",
-    "project_id": "lapor-book-acba3",
-    "storage_bucket": "lapor-book-acba3.appspot.com"
+    "project_number": "1053309673353",
+    "project_id": "lapor-book-be0b8",
+    "storage_bucket": "lapor-book-be0b8.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1025158976732:android:2bdc1e58c29e2c90329019",
+        "mobilesdk_app_id": "1:1053309673353:android:a0447baf9390cb86770b58",
         "android_client_info": {
           "package_name": "com.example.lapor_book"
         }
@@ -16,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA18tGjSiVtfzvfb7jJg-OVk7I8EwK_oZw"
+          "current_key": "AIzaSyCukNrHpAoIbd1L2HbYOjk9RiZB-Av3wuk"
         }
       ],
       "services": {

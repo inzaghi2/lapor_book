@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:lapor_book/pages/AddFormPage.dart';
-import 'package:lapor_book/pages/ProfilePage.dart';
+import 'package:lapor_book/pages/dashboard/ProfilePage.dart';
+import 'package:lapor_book/pages/dashboard/AllLaporan.dart';
+import 'package:lapor_book/pages/dashboard/MyLaporan.dart';
 
 import '../../components/styles.dart';
 import '../../models/akun.dart';
@@ -39,11 +40,6 @@ class _DashboardFull extends State<DashboardFull> {
     email: '',
     role: '',
   );
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
 
   void getAkun() async {
     setState(() {
@@ -58,7 +54,7 @@ class _DashboardFull extends State<DashboardFull> {
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        var userData = querySnapshot.docs.first.data();
+        var userData = querySnapshot.docs.first.data() as Map<String, dynamic>;
 
         setState(() {
           akun = Akun(
@@ -80,6 +76,12 @@ class _DashboardFull extends State<DashboardFull> {
         _isLoading = false;
       });
     }
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
   @override
@@ -105,7 +107,9 @@ class _DashboardFull extends State<DashboardFull> {
           backgroundColor: primaryColor,
           child: const Icon(Icons.add, size: 35),
           onPressed: () {
-            Navigator.pushNamed(context, '/add', arguments: {'akun': akun});
+            Navigator.pushNamed(context, '/add', arguments: {
+              'akun': akun,
+            });
             // Navigator.pushNamed(context, '/add', arguments: Akun);
           },
         ),

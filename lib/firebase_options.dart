@@ -26,7 +26,10 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        return ios;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for ios - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.macOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for macos - '
@@ -50,21 +53,10 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyA18tGjSiVtfzvfb7jJg-OVk7I8EwK_oZw',
-    appId: '1:1025158976732:android:2bdc1e58c29e2c90329019',
-    messagingSenderId: '1025158976732',
-    projectId: 'lapor-book-acba3',
-    databaseURL: 'https://lapor-book-acba3-default-rtdb.firebaseio.com',
-    storageBucket: 'lapor-book-acba3.appspot.com',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyA9Bzr6d_X6XY5bXDkzU_2aQi9bnzMFQUg',
-    appId: '1:1025158976732:ios:d8c4624a301b35ad329019',
-    messagingSenderId: '1025158976732',
-    projectId: 'lapor-book-acba3',
-    databaseURL: 'https://lapor-book-acba3-default-rtdb.firebaseio.com',
-    storageBucket: 'lapor-book-acba3.appspot.com',
-    iosBundleId: 'com.example.laporBook',
+    apiKey: 'AIzaSyCukNrHpAoIbd1L2HbYOjk9RiZB-Av3wuk',
+    appId: '1:1053309673353:android:a0447baf9390cb86770b58',
+    messagingSenderId: '1053309673353',
+    projectId: 'lapor-book-be0b8',
+    storageBucket: 'lapor-book-be0b8.appspot.com',
   );
 }

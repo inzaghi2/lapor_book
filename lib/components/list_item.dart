@@ -11,7 +11,7 @@ class ListItem extends StatefulWidget {
   final Laporan laporan;
   final Akun akun;
   final bool isLaporanku;
-  ListItem(
+  const ListItem(
       {super.key,
       required this.laporan,
       required this.akun,
@@ -88,7 +88,7 @@ class _ListItemState extends State<ListItem> {
                     height: 130,
                   )
                 : Image.asset(
-                    'assets/istock-default.jpg',
+                    'assets/download.png',
                     width: 130,
                     height: 130,
                   ),
