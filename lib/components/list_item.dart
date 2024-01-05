@@ -1,83 +1,82 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:lapor_book/components/styles.dart';
-
-import '../models/akun.dart';
-import '../models/laporan.dart';
+import 'package:lapor_book/components/vars.dart';
+import 'package:lapor_book/models/akun.dart';
+import 'package:lapor_book/models/laporan.dart';
 
 class ListItem extends StatefulWidget {
-  final Laporan laporan;
   final Akun akun;
+  final Laporan laporan;
   final bool isLaporanku;
   const ListItem(
       {super.key,
-      required this.laporan,
+      required this.isLaporanku,
       required this.akun,
-      required this.isLaporanku});
+      required this.laporan});
 
   @override
   State<ListItem> createState() => _ListItemState();
 }
 
 class _ListItemState extends State<ListItem> {
-  // fungsi delete
-  final _firestore = FirebaseFirestore.instance;
+  final _db = FirebaseAuth.instance;
   final _storage = FirebaseStorage.instance;
 
-  void deleteLaporan() async {
+  void delete() async {
     try {
-      await _firestore.collection('laporan').doc(widget.laporan.docId).delete();
-
-      // menghapus gambar dari storage
+      CollectionReference laporanCollection =
+          FirebaseFirestore.instance.collection('laporan');
       if (widget.laporan.gambar != '') {
         await _storage.refFromURL(widget.laporan.gambar!).delete();
       }
-      Navigator.popAndPushNamed(context, '/dashboard');
+
+      await laporanCollection.doc(widget.laporan.docId).delete();
     } catch (e) {
       print(e);
     }
   }
 
-  // build
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          border: Border.all(width: 2),
-          borderRadius: BorderRadius.circular(10)),
+        border: Border.all(width: 2),
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: InkWell(
         onTap: () {
           Navigator.pushNamed(context, '/detail', arguments: {
-            'laporan': widget.laporan,
             'akun': widget.akun,
+            'laporan': widget.laporan,
           });
         },
         onLongPress: () {
-          if (widget.isLaporanku) {
+          if (widget.isLaporanku)
             showDialog(
                 context: context,
-                builder: (BuildContext) {
+                builder: (BuildContext buildContext) {
                   return AlertDialog(
-                    title: Text('Delete ${widget.laporan.judul}?'),
+                    title: Text('Hapus ${widget.laporan.judul}'),
                     actions: [
                       TextButton(
                         onPressed: () {
-                          Navigator.pop(context);
+                          Navigator.pop(buildContext);
                         },
-                        child: Text('Batal'),
+                        child: Text('Cancel'),
                       ),
                       TextButton(
                         onPressed: () {
-                          deleteLaporan();
+                          delete();
+                          Navigator.pop(buildContext);
                         },
-                        child: Text('Hapus'),
+                        child: Text('Delete'),
                       ),
                     ],
                   );
                 });
-          }
         },
         child: Column(
           children: [
@@ -95,9 +94,11 @@ class _ListItemState extends State<ListItem> {
             Container(
               width: double.infinity,
               alignment: Alignment.center,
-              padding: const EdgeInsets.symmetric(vertical: 10),
+              padding: EdgeInsets.symmetric(vertical: 10),
               decoration: const BoxDecoration(
-                  border: Border.symmetric(horizontal: BorderSide(width: 2))),
+                  border: Border.symmetric(
+                horizontal: BorderSide(width: 2),
+              )),
               child: Text(
                 widget.laporan.judul,
                 style: headerStyle(level: 4),
@@ -107,15 +108,21 @@ class _ListItemState extends State<ListItem> {
               children: [
                 Expanded(
                   child: Container(
+                    alignment: Alignment.center,
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
-                        color: warningColor,
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(5),
-                        ),
-                        border: const Border.symmetric(
-                            vertical: BorderSide(width: 1))),
-                    alignment: Alignment.center,
+                      color: widget.laporan.status == 'Posted'
+                          ? warnaStatus[0]
+                          : widget.laporan.status == 'Process'
+                              ? warnaStatus[1]
+                              : warnaStatus[2],
+                      border: const Border(
+                        right: BorderSide(width: 2),
+                      ),
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(8),
+                      ),
+                    ),
                     child: Text(
                       widget.laporan.status,
                       style: headerStyle(level: 5, dark: false),
@@ -124,20 +131,20 @@ class _ListItemState extends State<ListItem> {
                 ),
                 Expanded(
                   child: Container(
+                    alignment: Alignment.center,
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
-                        color: primaryColor,
-                        borderRadius: const BorderRadius.only(
-                            bottomRight: Radius.circular(5)),
-                        border: const Border.symmetric(
-                            vertical: BorderSide(width: 1))),
-                    alignment: Alignment.center,
+                      color: successColor,
+                      borderRadius: const BorderRadius.only(
+                        bottomRight: Radius.circular(8),
+                      ),
+                    ),
                     child: Text(
-                      DateFormat('dd/MM/yyyy').format(widget.laporan.tanggal),
+                      '09/11/2023',
                       style: headerStyle(level: 5, dark: false),
                     ),
                   ),
-                )
+                ),
               ],
             )
           ],

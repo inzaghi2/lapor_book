@@ -22,14 +22,14 @@ class StatusDialog extends StatefulWidget {
 
 class _StatusDialogState extends State<StatusDialog> {
   late String status;
-  final _firestore = FirebaseFirestore.instance;
+  final _db = FirebaseFirestore.instance;
 
   void updateStatus() async {
-    CollectionReference transaksiCollection = _firestore.collection('laporan');
-
-    // Convert DateTime to Firestore Timestamp
-
     try {
+      CollectionReference transaksiCollection = _db.collection('laporan');
+
+      // Convert DateTime to Firestore Timestamp
+
       await transaksiCollection.doc(widget.laporan.docId).update({
         'status': status,
       });
@@ -58,10 +58,14 @@ class _StatusDialogState extends State<StatusDialog> {
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
+          children: [
+            Text(
+              'Judul Laporan :',
+              style: headerStyle(level: 2),
+            ),
             Text(
               widget.laporan.judul,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: headerStyle(level: 3),
             ),
             SizedBox(height: 20),
             RadioListTile<String>(
@@ -97,7 +101,6 @@ class _StatusDialogState extends State<StatusDialog> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                print(status);
                 updateStatus();
               },
               style: TextButton.styleFrom(

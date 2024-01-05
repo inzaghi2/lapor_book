@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:lapor_book/components/vars.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../components/status_dialog.dart';
@@ -64,52 +65,31 @@ class _DetailPageState extends State<DetailPage> {
               )
             : SingleChildScrollView(
                 child: Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+                  margin: const EdgeInsets.all(30),
                   width: double.infinity,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      if (akun.role == 'admin')
-                        Container(
-                          width: 250,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                status = laporan.status;
-                              });
-                              statusDialog(laporan);
-                            },
-                            style: TextButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: primaryColor,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            child: const Text('Ubah Status'),
-                          ),
-                        ),
                       Text(
                         laporan.judul,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        style: headerStyle(level: 2),
                       ),
                       const SizedBox(height: 15),
                       laporan.gambar != ''
                           ? Image.network(laporan.gambar!)
-                          : Image.asset('assets/istock-default.jpg'),
+                          : Image.asset('assets/download.png'),
                       const SizedBox(height: 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          laporan.status == 'Posted'
-                              ? textStatus(
-                                  'Posted', Colors.yellow, Colors.black)
-                              : laporan.status == 'Process'
-                                  ? textStatus(
-                                      'Process', Colors.green, Colors.white)
-                                  : textStatus(
-                                      'Done', Colors.blue, Colors.white),
+                          textStatus(
+                              laporan.status,
+                              laporan.status == 'Posted'
+                                  ? warnaStatus[0]
+                                  : laporan.status == 'Process'
+                                      ? warnaStatus[1]
+                                      : warnaStatus[2],
+                              Colors.white),
                           textStatus(
                               laporan.instansi, Colors.white, Colors.black),
                         ],
@@ -137,16 +117,42 @@ class _DetailPageState extends State<DetailPage> {
                         ),
                       ),
                       const SizedBox(height: 50),
-                      const Text(
+                      Text(
                         'Deskripsi Laporan',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: headerStyle(level: 2),
                       ),
                       const SizedBox(height: 20),
                       Container(
                         width: double.infinity,
                         margin: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Text(laporan.deskripsi ?? ''),
+                        child: Text(
+                          laporan.deskripsi ?? '',
+                          textAlign: TextAlign.center,
+                        ),
                       ),
+                      const SizedBox(
+                        height: 50,
+                      ),
+                      if (akun.role == 'admin')
+                        Container(
+                          width: 250,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                status = laporan.status;
+                              });
+                              statusDialog(laporan);
+                            },
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: primaryColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: const Text('Ubah Status'),
+                          ),
+                        ),
                     ],
                   ),
                 ),
