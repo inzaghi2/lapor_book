@@ -27,6 +27,13 @@ class _MyLaporanState extends State<MyLaporan> {
         () {
           listLaporan.clear();
           for (var documents in querySnapshot.docs) {
+            List<dynamic>? komentarData = documents.data()['komentar'];
+            List<Komentar>? listKomentar = komentarData?.map((map) {
+              return Komentar(
+                nama: map['nama'],
+                isi: map['isi'],
+              );
+            }).toList();
             listLaporan.add(
               Laporan(
                 uid: documents.data()['uid'],
@@ -39,6 +46,8 @@ class _MyLaporanState extends State<MyLaporan> {
                 maps: documents.data()['maps'],
                 deskripsi: documents.data()['deskripsi'],
                 gambar: documents.data()['gambar'],
+                komentar: listKomentar,
+                like: documents.data()['likes'],
               ),
             );
           }

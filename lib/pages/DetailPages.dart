@@ -1,8 +1,10 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lapor_book/components/buttonLike.dart';
-import 'package:lapor_book/components/countLike.dart';
+
 import 'package:lapor_book/components/vars.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -20,8 +22,7 @@ class DetailPage extends StatefulWidget {
 class _DetailPageState extends State<DetailPage> {
   final _db = FirebaseFirestore.instance;
   final bool _isLoading = false;
-
-  int likes = 0;
+  bool isButtonVisible = true;
 
   String? status;
 
@@ -51,17 +52,37 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
-  void countLike(String laporanId) async {
+  void addLike(Laporan laporan, Akun akun) async {
+    setState(() {
+      isButtonVisible = false;
+    });
     try {
-      QuerySnapshot<Map<String, dynamic>> querySnapshot = await _db
-          .collection('likes')
-          .where('laporanId', isEqualTo: laporanId)
-          .get();
-      setState(() {
-        likes = querySnapshot.docs.length;
+      CollectionReference laporanCollection = _db.collection('laporan');
+      await laporanCollection.doc(laporan.docId).update({
+        'likes': FieldValue.arrayUnion([akun.nama]),
       });
+      final snackbar = SnackBar(content: Text('Berhasil Like'));
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
     } catch (e) {
-      debugPrint("$e");
+      final snackbar = SnackBar(content: Text(e.toString()));
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    }
+  }
+
+  Future<bool> disappear(Laporan laporan, Akun akun) async {
+    DocumentSnapshot documentLaporan =
+        await _db.collection('laporan').doc(laporan.docId).get();
+    if (documentLaporan.exists) {
+      List<dynamic> likes = [];
+      dynamic reportData = documentLaporan.data();
+      if (reportData != null && reportData is Map<String, dynamic>) {
+        likes = reportData['likes'] ?? [];
+      }
+      bool userLiked = likes.contains(akun.nama);
+
+      return !userLiked;
+    } else {
+      return true;
     }
   }
 
@@ -72,7 +93,7 @@ class _DetailPageState extends State<DetailPage> {
 
     Laporan laporan = arguments['laporan'];
     Akun akun = arguments['akun'];
-    countLike(laporan.docId);
+    // Future<int> likes = countLike(laporan.docId);
 
     return Scaffold(
       appBar: AppBar(
@@ -179,8 +200,18 @@ class _DetailPageState extends State<DetailPage> {
                       const SizedBox(
                         height: 10,
                       ),
-                      CounterLike(qty: likes),
-                      ButtonLike(laporan: laporan),
+                      // CounterLike(qty: likes),
+                      FutureBuilder<bool>(
+                          future: disappear(laporan, akun),
+                          builder: (context, snapshot) {
+                            bool isUserLiked = snapshot.data ?? false;
+                            return Visibility(
+                              visible: isUserLiked,
+                              child: ButtonLike(onPressed: () {
+                                addLike(laporan, akun);
+                              }),
+                            );
+                          }),
                     ],
                   ),
                 ),

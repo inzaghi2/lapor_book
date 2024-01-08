@@ -47,6 +47,7 @@ class _AllLaporanState extends State<AllLaporan> {
               deskripsi: documents.data()['deskripsi'],
               gambar: documents.data()['gambar'],
               komentar: listKomentar,
+              like: documents.data()['likes'],
             ),
           );
         }

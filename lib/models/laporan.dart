@@ -13,6 +13,7 @@ class Laporan {
   final DateTime tanggal;
   final String maps;
   List<Komentar>? komentar;
+  List<dynamic>? like;
 
   Laporan({
     required this.uid,
@@ -26,6 +27,7 @@ class Laporan {
     required this.tanggal,
     required this.maps,
     this.komentar,
+    this.like,
   });
 }
 

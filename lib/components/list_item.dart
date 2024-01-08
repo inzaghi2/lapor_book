@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:lapor_book/components/styles.dart';
 import 'package:lapor_book/components/vars.dart';
 import 'package:lapor_book/models/akun.dart';
@@ -21,8 +22,6 @@ class ListItem extends StatefulWidget {
 }
 
 class _ListItemState extends State<ListItem> {
-  int likes = 0;
-  final _db = FirebaseFirestore.instance;
   final _storage = FirebaseStorage.instance;
 
   void delete() async {
@@ -39,26 +38,8 @@ class _ListItemState extends State<ListItem> {
     }
   }
 
-  void countLike(String laporanId) async {
-    debugPrint("count like");
-    try {
-      QuerySnapshot<Map<String, dynamic>> querySnapshot = await _db
-          .collection("likes")
-          .where('laporanId', isEqualTo: laporanId)
-          .get();
-
-      setState(() {
-        likes = querySnapshot.docs.length;
-      });
-    } catch (e) {
-      print(e);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    countLike(widget.laporan.docId);
-    // final laporan = ModalRoute.of(context)!.settings.arguments as Laporan;
     return Container(
       decoration: BoxDecoration(
         border: Border.all(width: 2),
@@ -153,7 +134,7 @@ class _ListItemState extends State<ListItem> {
                       color: successColor,
                     ),
                     child: Text(
-                      '09/11/2023',
+                      DateFormat('dd/MM/yyyy').format(widget.laporan.tanggal),
                       style: headerStyle(level: 5, dark: false),
                     ),
                   ),
@@ -166,7 +147,7 @@ class _ListItemState extends State<ListItem> {
               children: [
                 const Icon(Icons.favorite, color: Colors.red, size: 30),
                 Text(
-                  '$likes Likes',
+                  '${widget.laporan.like?.length ?? 0}',
                   style: headerStyle(level: 2),
                 )
               ],
