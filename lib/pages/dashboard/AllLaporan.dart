@@ -23,27 +23,34 @@ class _AllLaporanState extends State<AllLaporan> {
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
           await FirebaseFirestore.instance.collection('laporan').get();
 
-      setState(
-        () {
-          listLaporan.clear();
-          for (var documents in querySnapshot.docs) {
-            listLaporan.add(
-              Laporan(
-                uid: documents.data()['uid'],
-                docId: documents.data()['docId'],
-                judul: documents.data()['judul'],
-                instansi: documents.data()['instansi'],
-                nama: documents.data()['nama'],
-                status: documents.data()['status'],
-                tanggal: documents.data()['tanggal'].toDate(),
-                maps: documents.data()['maps'],
-                deskripsi: documents.data()['deskripsi'],
-                gambar: documents.data()['gambar'],
-              ),
+      setState(() {
+        listLaporan.clear();
+        for (var documents in querySnapshot.docs) {
+          List<dynamic>? komentarData = documents.data()['komentar'];
+          List<Komentar>? listKomentar = komentarData?.map((map) {
+            return Komentar(
+              nama: map['nama'],
+              isi: map['isi'],
             );
-          }
-        },
-      );
+          }).toList();
+
+          listLaporan.add(
+            Laporan(
+              uid: documents.data()['uid'],
+              docId: documents.data()['docId'],
+              judul: documents.data()['judul'],
+              instansi: documents.data()['instansi'],
+              nama: documents.data()['nama'],
+              status: documents.data()['status'],
+              tanggal: documents.data()['tanggal'].toDate(),
+              maps: documents.data()['maps'],
+              deskripsi: documents.data()['deskripsi'],
+              gambar: documents.data()['gambar'],
+              komentar: listKomentar,
+            ),
+          );
+        }
+      });
     } catch (e) {
       print(e);
     }
@@ -60,7 +67,7 @@ class _AllLaporanState extends State<AllLaporan> {
                 crossAxisCount: 2,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
-                childAspectRatio: 1 / 1.168),
+                childAspectRatio: 1 / 1.38),
             itemCount: listLaporan.length,
             itemBuilder: (context, index) {
               return ListItem(

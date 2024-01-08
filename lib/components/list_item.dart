@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:lapor_book/components/styles.dart';
@@ -22,7 +21,8 @@ class ListItem extends StatefulWidget {
 }
 
 class _ListItemState extends State<ListItem> {
-  final _db = FirebaseAuth.instance;
+  int likes = 0;
+  final _db = FirebaseFirestore.instance;
   final _storage = FirebaseStorage.instance;
 
   void delete() async {
@@ -39,8 +39,26 @@ class _ListItemState extends State<ListItem> {
     }
   }
 
+  void countLike(String laporanId) async {
+    debugPrint("count like");
+    try {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot = await _db
+          .collection("likes")
+          .where('laporanId', isEqualTo: laporanId)
+          .get();
+
+      setState(() {
+        likes = querySnapshot.docs.length;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    countLike(widget.laporan.docId);
+    // final laporan = ModalRoute.of(context)!.settings.arguments as Laporan;
     return Container(
       decoration: BoxDecoration(
         border: Border.all(width: 2),
@@ -54,7 +72,7 @@ class _ListItemState extends State<ListItem> {
           });
         },
         onLongPress: () {
-          if (widget.isLaporanku)
+          if (widget.isLaporanku) {
             showDialog(
                 context: context,
                 builder: (BuildContext buildContext) {
@@ -77,6 +95,7 @@ class _ListItemState extends State<ListItem> {
                     ],
                   );
                 });
+          }
         },
         child: Column(
           children: [
@@ -119,9 +138,6 @@ class _ListItemState extends State<ListItem> {
                       border: const Border(
                         right: BorderSide(width: 2),
                       ),
-                      borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(8),
-                      ),
                     ),
                     child: Text(
                       widget.laporan.status,
@@ -135,9 +151,6 @@ class _ListItemState extends State<ListItem> {
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
                       color: successColor,
-                      borderRadius: const BorderRadius.only(
-                        bottomRight: Radius.circular(8),
-                      ),
                     ),
                     child: Text(
                       '09/11/2023',
@@ -145,8 +158,19 @@ class _ListItemState extends State<ListItem> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 20),
               ],
-            )
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.favorite, color: Colors.red, size: 30),
+                Text(
+                  '$likes Likes',
+                  style: headerStyle(level: 2),
+                )
+              ],
+            ),
           ],
         ),
       ),

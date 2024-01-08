@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:lapor_book/components/buttonLike.dart';
+import 'package:lapor_book/components/countLike.dart';
 import 'package:lapor_book/components/vars.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -15,7 +18,10 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
+  final _db = FirebaseFirestore.instance;
   final bool _isLoading = false;
+
+  int likes = 0;
 
   String? status;
 
@@ -27,20 +33,36 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   void statusDialog(Laporan laporan) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatusDialog(
-          status: status!,
-          laporan: laporan,
-          onValueChanged: (value) {
-            setState(() {
-              status = value;
-            });
-          },
-        );
-      },
-    );
+    if (mounted) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatusDialog(
+            status: status!,
+            laporan: laporan,
+            onValueChanged: (value) {
+              setState(() {
+                status = value;
+              });
+            },
+          );
+        },
+      );
+    }
+  }
+
+  void countLike(String laporanId) async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot = await _db
+          .collection('likes')
+          .where('laporanId', isEqualTo: laporanId)
+          .get();
+      setState(() {
+        likes = querySnapshot.docs.length;
+      });
+    } catch (e) {
+      debugPrint("$e");
+    }
   }
 
   @override
@@ -50,6 +72,7 @@ class _DetailPageState extends State<DetailPage> {
 
     Laporan laporan = arguments['laporan'];
     Akun akun = arguments['akun'];
+    countLike(laporan.docId);
 
     return Scaffold(
       appBar: AppBar(
@@ -153,6 +176,11 @@ class _DetailPageState extends State<DetailPage> {
                             child: const Text('Ubah Status'),
                           ),
                         ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      CounterLike(qty: likes),
+                      ButtonLike(laporan: laporan),
                     ],
                   ),
                 ),

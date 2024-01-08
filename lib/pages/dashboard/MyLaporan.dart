@@ -60,7 +60,7 @@ class _MyLaporanState extends State<MyLaporan> {
                 crossAxisCount: 2,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
-                childAspectRatio: 1 / 1.168),
+                childAspectRatio: 1 / 1.38),
             itemCount: listLaporan.length,
             itemBuilder: (context, index) {
               return ListItem(

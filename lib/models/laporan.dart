@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 class Laporan {
   final String uid;
   final String docId;
